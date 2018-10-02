@@ -197,7 +197,7 @@ gen virtual3 = non_labor_inc - incss
 
 *Try reg in stata first
 *truncreg annhours netwage virtual menos65 hsgrad nonwhite married, ll(0)
-truncreg annhours netwage1 netwage2 netwage3 virtual1 virtual2 virtual3 threshold_hours budget_segment,ll(0)
+truncreg annhours netwage1 netwage2 netwage3 virtual1 virtual2 virtual3 threshold_hours budget_segment hsgrad nonwhite married menos65,ll(0)
 *matrix beta = e(b)
 
 program drop _all
@@ -230,20 +230,28 @@ ml maximize
 
 
 ************Trying to figure out which is which - HERE THERE IS A PROBLEM ---> THINGS SHOULD COINCIDE
-g probar = belowkink + middlesegment+uppersegment+atkink
+g probar = belowkink + middlesegment + uppersegment + atkink
 tab probar,m
 
 g MS=(threshold<earnings<threshold+incss/tau)
 g BK=(earnings<threshold)
-tab BK belowkink
+g atBK=belowkink+ atkink
+tab BK belowkink 
+tab BK atBK
 tab MS middlesegment
 
+test
 
 
 
 
 
+*****************
+* Question 3
+*****************
 
+clear all
+use 
 
 
 
