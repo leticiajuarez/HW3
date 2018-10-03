@@ -1,0 +1,1065 @@
+-------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/leticiajuarez/Desktop/621 - Field Class Labor/Homeworks/HW3/HW3.log
+  log type:  text
+ opened on:   2 Oct 2018, 19:56:24
+
+. 
+. 
+. *Get Data
+. use MROZ.dta
+
+. 
+. label variable kidslt6 "number kids < 6 years"
+
+. label variable kidsge6 "number kids 6-18"
+
+. g all=1 
+
+. g nl= (faminc - wage*hours - huswage*hushrs)/1000
+
+. g age2=age^2
+
+. g age3=age^3
+
+. g ed2=edu^2
+
+. g ed3=educ^3
+
+. g inter1=age*educ
+
+. g inter2=age2*educ
+
+. g inter3=age*ed2
+
+. 
+. 
+. global horder age2 age3 ed2 ed3 inter1 inter2 inter3 unem city motheduc fatheduc
+
+. global back nwifeinc kidslt6 kidsge6 age educ
+
+. 
+. 
+. ****************
+. *   Question 1 *
+. ****************
+. 
+. 
+. *--------
+. *   A   *
+. *--------
+. g w = (hours > 0)
+
+. probit w $back $horder
+
+Iteration 0:   log likelihood =  -514.8732  
+Iteration 1:   log likelihood =  -450.8853  
+Iteration 2:   log likelihood =  -450.4777  
+Iteration 3:   log likelihood = -450.47746  
+Iteration 4:   log likelihood = -450.47746  
+
+Probit regression                               Number of obs     =        753
+                                                LR chi2(16)       =     128.79
+                                                Prob > chi2       =     0.0000
+Log likelihood = -450.47746                     Pseudo R2         =     0.1251
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |   -.022003   .0047666    -4.62   0.000    -.0313454   -.0126606
+     kidslt6 |  -.8579509   .1188431    -7.22   0.000    -1.090879   -.6250226
+     kidsge6 |  -.0603097   .0439087    -1.37   0.170    -.1463692    .0257497
+         age |   .7521026     .76984     0.98   0.329    -.7567562    2.260961
+        educ |    1.09907   1.922726     0.57   0.568    -2.669404    4.867544
+        age2 |  -.0151855   .0145537    -1.04   0.297    -.0437101    .0133392
+        age3 |    .000107   .0001011     1.06   0.290    -.0000911    .0003051
+         ed2 |  -.0636591   .1056755    -0.60   0.547    -.2707794    .1434611
+         ed3 |   .0012697   .0023487     0.54   0.589    -.0033336     .005873
+      inter1 |  -.0154558   .0446633    -0.35   0.729    -.1029943    .0720827
+      inter2 |  -2.10e-06   .0003764    -0.01   0.996    -.0007399    .0007357
+      inter3 |   .0006687   .0008759     0.76   0.445    -.0010481    .0023855
+        unem |  -.0102966   .0161046    -0.64   0.523     -.041861    .0212678
+        city |   .0414417     .10854     0.38   0.703    -.1712928    .2541763
+    motheduc |   .0026455    .018479     0.14   0.886    -.0335726    .0388636
+    fatheduc |  -.0125127    .017534    -0.71   0.475    -.0468787    .0218532
+       _cons |  -14.06639   15.98708    -0.88   0.379     -45.4005    17.26772
+------------------------------------------------------------------------------
+
+. 
+. *--------
+. *   B   *
+. *--------
+. 
+. program myolsnorm
+  1. version 14
+  2. args lnf theta1 lnsigma
+  3. tempvar sigma
+  4. gen double `sigma' = exp(`lnsigma')
+  5. quietly replace `lnf' = ln(normalden($ML_y1, `theta1', `sigma'))
+  6. end
+
+. 
+. *OLS
+. ml model lf myolsnorm (beta: hours = $back $horder)(lnsigma:)
+
+. ml search
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -8222.9633
+rescale:       log likelihood = -8222.9633
+rescale eq:    log likelihood = -8222.5569
+
+. ml maximize
+
+initial:       log likelihood = -8222.5569
+rescale:       log likelihood = -8222.5569
+rescale eq:    log likelihood = -8222.5569
+Iteration 0:   log likelihood = -8222.5569  
+Iteration 1:   log likelihood = -7597.5351  (not concave)
+Iteration 2:   log likelihood = -6562.9214  (not concave)
+Iteration 3:   log likelihood = -6426.4361  (not concave)
+Iteration 4:   log likelihood = -6363.7583  
+Iteration 5:   log likelihood = -6194.7653  
+Iteration 6:   log likelihood = -6112.6136  
+Iteration 7:   log likelihood = -6112.3797  
+Iteration 8:   log likelihood = -6112.3797  
+
+                                                Number of obs     =        753
+                                                Wald chi2(16)     =     114.73
+Log likelihood = -6112.3797                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+       hours |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+beta         |
+    nwifeinc |    -10.486   2.748094    -3.82   0.000    -15.87217   -5.099837
+     kidslt6 |  -461.6535   65.20471    -7.08   0.000    -589.4523   -333.8546
+     kidsge6 |  -109.3732   26.84299    -4.07   0.000    -161.9845   -56.76194
+         age |   364.3008   453.5585     0.80   0.422    -524.6574    1253.259
+        educ |  -680.5892   1095.998    -0.62   0.535    -2828.705    1467.527
+        age2 |  -9.478057   8.731676    -1.09   0.278    -26.59183    7.635714
+        age3 |    .069975    .061143     1.14   0.252     -.049863     .189813
+         ed2 |   42.77333   61.61349     0.69   0.488     -77.9869    163.5336
+         ed3 |  -1.181588   1.390369    -0.85   0.395    -3.906661    1.543484
+      inter1 |   7.079507   25.19365     0.28   0.779    -42.29914    56.45815
+      inter2 |  -.0583527   .2149201    -0.27   0.786    -.4795884     .362883
+      inter3 |   .0496601   .4957944     0.10   0.920    -.9220791    1.021399
+        unem |  -14.90946   9.804133    -1.52   0.128     -34.1252    4.306289
+        city |   14.51544   65.67279     0.22   0.825    -114.2009    143.2317
+    motheduc |   6.862262    11.2654     0.61   0.542    -15.21751    28.94204
+    fatheduc |   -11.2515   10.64474    -1.06   0.291     -32.1148    9.611797
+       _cons |  -915.9593   9208.462    -0.10   0.921    -18964.21    17132.29
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |   6.698431   .0257684   259.95   0.000     6.647926    6.748937
+------------------------------------------------------------------------------
+
+. 
+. *Check if it matches OLS REG
+. reg hours $back $horder
+
+      Source |       SS           df       MS      Number of obs   =       753
+-------------+----------------------------------   F(16, 736)      =      7.01
+       Model |  75483860.5        16  4717741.28   Prob > F        =    0.0000
+    Residual |   495425863       736  673132.966   R-squared       =    0.1322
+-------------+----------------------------------   Adj R-squared   =    0.1134
+       Total |   570909724       752  759188.463   Root MSE        =    820.45
+
+------------------------------------------------------------------------------
+       hours |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |    -10.486   2.779651    -3.77   0.000    -15.94299   -5.029013
+     kidslt6 |  -461.6535   65.95346    -7.00   0.000    -591.1328   -332.1741
+     kidsge6 |  -109.3732   27.15123    -4.03   0.000    -162.6763   -56.07014
+         age |   364.3008   458.7667     0.79   0.427    -536.3465    1264.948
+        educ |  -680.5891   1108.583    -0.61   0.539    -2856.951    1495.773
+        age2 |  -9.478056   8.831942    -1.07   0.284    -26.81686    7.860746
+        age3 |    .069975   .0618451     1.13   0.258    -.0514388    .1913887
+         ed2 |   42.77332   62.32101     0.69   0.493     -79.5748    165.1214
+         ed3 |  -1.181588   1.406334    -0.84   0.401    -3.942493    1.579316
+      inter1 |   7.079506   25.48295     0.28   0.781    -42.94843    57.10744
+      inter2 |  -.0583527    .217388    -0.27   0.788    -.4851272    .3684219
+      inter3 |   .0496601   .5014877     0.10   0.921    -.9348567    1.034177
+        unem |  -14.90946   9.916714    -1.50   0.133    -34.37787    4.558961
+        city |   14.51543   66.42691     0.22   0.827    -115.8934    144.9242
+    motheduc |   6.862262   11.39476     0.60   0.547    -15.50784    29.23237
+    fatheduc |   -11.2515   10.76697    -1.05   0.296    -32.38914    9.886133
+       _cons |  -915.9591   9314.203    -0.10   0.922    -19201.53    17369.61
+------------------------------------------------------------------------------
+
+. 
+. 
+. *--------
+. *   C   *
+. *--------
+. 
+. program drop _all
+
+. capture program drop mytruncated
+
+. 
+. program mytruncated
+  1. version 14
+  2. args lnf theta1 lnsigma
+  3. tempvar sigma
+  4. g double `sigma' = exp(`lnsigma') 
+  5. qui replace `lnf' = ln((1/`sigma')*normalden(($ML_y1-`theta1')/`sigma'))-ln(normal(`theta1'/
+> `sigma'))
+  6. qui replace $ML_samp=0 if $ML_y1==0
+  7. end
+
+. 
+. *multiply by 1/sigma because its not normal (0,1)
+. 
+. *Truncated Version
+. ml model lf mytruncated (beta: hours = $back $horder)(lnsigma:)
+
+. ml search
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -4377.7962
+rescale:       log likelihood = -4377.7962
+rescale eq:    log likelihood = -4377.6527
+
+. ml maximize
+
+initial:       log likelihood = -4377.6527
+rescale:       log likelihood = -4377.6527
+rescale eq:    log likelihood = -4377.6527
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 0:   log likelihood = -4377.6527  (not concave)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 1:   log likelihood = -3578.3002  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 2:   log likelihood = -3476.3043  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 3:   log likelihood = -3471.9482  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 4:   log likelihood = -3466.6233  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 5:   log likelihood =  -3419.108  (not concave)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 6:   log likelihood = -3406.9867  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 7:   log likelihood = -3403.9945  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 8:   log likelihood = -3401.3449  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 9:   log likelihood = -3401.3126  
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+(325 missing values generated)
+Iteration 10:  log likelihood = -3401.3126  
+
+                                                Number of obs     =        753
+                                                Wald chi2(16)     =      39.58
+Log likelihood = -3401.3126                     Prob > chi2       =     0.0009
+
+------------------------------------------------------------------------------
+       hours |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+beta         |
+    nwifeinc |  -7.071286   5.538967    -1.28   0.202    -17.92746     3.78489
+     kidslt6 |  -484.0469   167.8134    -2.88   0.004    -812.9552   -155.1386
+     kidsge6 |  -215.9444   50.25696    -4.30   0.000    -314.4463   -117.4426
+         age |   -277.147   776.2083    -0.36   0.721    -1798.487    1244.193
+        educ |  -4689.516   2102.495    -2.23   0.026     -8810.33   -568.7021
+        age2 |   -4.96709   15.27853    -0.33   0.745    -34.91246    24.97828
+        age3 |   .0523208   .1120591     0.47   0.641    -.1673111    .2719526
+         ed2 |   237.1019   116.4408     2.04   0.042     8.882037    465.3217
+         ed3 |  -4.252427   2.587378    -1.64   0.100    -9.323595    .8187417
+      inter1 |   76.43944   46.31838     1.65   0.099    -14.34291    167.2218
+      inter2 |   -.240037   .3954647    -0.61   0.544    -1.015133    .5350596
+      inter3 |   -1.88593   .9879311    -1.91   0.056     -3.82224    .0503791
+        unem |   -28.6413   17.75382    -1.61   0.107    -63.43814    6.155544
+        city |   10.40968   113.9239     0.09   0.927    -212.8771    233.6964
+    motheduc |   12.73594   19.43082     0.66   0.512    -25.34776    50.81964
+    fatheduc |  -13.51098   18.72211    -0.72   0.471    -50.20564    23.18368
+       _cons |   25890.28   16516.59     1.57   0.117    -6481.634     58262.2
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |   6.780857   .0528774   128.24   0.000      6.67722    6.884495
+------------------------------------------------------------------------------
+
+. 
+. *Check if it matches OLS REG
+. truncreg hours $back $horder, ll(0)
+(note: 325 obs. truncated)
+
+Fitting full model:
+
+Iteration 0:   log likelihood = -3411.3446  
+Iteration 1:   log likelihood = -3401.4854  
+Iteration 2:   log likelihood = -3401.3129  
+Iteration 3:   log likelihood = -3401.3126  
+
+Truncated regression
+Limit:   lower =          0                     Number of obs     =        428
+         upper =       +inf                     Wald chi2(16)     =      39.58
+Log likelihood = -3401.3126                     Prob > chi2       =     0.0009
+
+------------------------------------------------------------------------------
+       hours |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |  -7.071263   5.538932    -1.28   0.202    -17.92737    3.784844
+     kidslt6 |  -484.0447   167.8123    -2.88   0.004    -812.9507   -155.1387
+     kidsge6 |  -215.9438   50.25663    -4.30   0.000     -314.445   -117.4426
+         age |   -277.146   776.2035    -0.36   0.721    -1798.477    1244.185
+        educ |  -4689.505   2102.482    -2.23   0.026    -8810.294   -568.7169
+        age2 |  -4.967086   15.27844    -0.33   0.745    -34.91228     24.9781
+        age3 |   .0523207   .1120584     0.47   0.641    -.1673098    .2719512
+         ed2 |   237.1013   116.4401     2.04   0.042     8.882913    465.3198
+         ed3 |  -4.252417   2.587363    -1.64   0.100    -9.323554    .8187203
+      inter1 |   76.43926   46.31809     1.65   0.099    -14.34253     167.221
+      inter2 |  -.2400363   .3954622    -0.61   0.544    -1.015128    .5350553
+      inter3 |  -1.885926    .987925    -1.91   0.056    -3.822224     .050371
+        unem |  -28.64122   17.75371    -1.61   0.107    -63.43784    6.155404
+        city |   10.40963   113.9232     0.09   0.927    -212.8757     233.695
+    motheduc |    12.7359    19.4307     0.66   0.512    -25.34757    50.81937
+    fatheduc |  -13.51094   18.72199    -0.72   0.471    -50.20537     23.1835
+       _cons |   25890.22   16516.48     1.57   0.117    -6481.492    58261.94
+-------------+----------------------------------------------------------------
+      /sigma |   880.8197   46.57499    18.91   0.000     789.5344     972.105
+------------------------------------------------------------------------------
+
+. 
+. 
+. *--------
+. *   D   *
+. *--------
+. program drop _all
+
+. capture program drop mytobit
+
+. 
+. program mytobit
+  1. version 14
+  2. args lnf beta sigma
+  3.     tempvar lnlj
+  4.     quietly {
+  5.         gen double `lnlj' = log(1-normal(`beta'/`sigma')) if $ML_y1==0 
+  6.         replace `lnlj' = log((1/`sigma')*normalden(($ML_y1-`beta')/`sigma')) if $ML_y1>0 
+  7.         replace `lnf' = `lnlj' 
+  8.     }
+  9. end
+
+. 
+. 
+. *Tobit
+. ml model lf mytobit (beta: hours = $back $horder)(lnsigma:)
+
+. ml search
+initial:       log likelihood =     -<inf>  (could not be evaluated)
+feasible:      log likelihood = -25190.515
+rescale:       log likelihood = -4643.9309
+rescale eq:    log likelihood = -3985.4737
+
+. ml maximize
+
+initial:       log likelihood = -3985.4737
+rescale:       log likelihood = -3985.4737
+rescale eq:    log likelihood = -3985.4737
+Iteration 0:   log likelihood = -3985.4737  
+Iteration 1:   log likelihood = -3903.5677  
+Iteration 2:   log likelihood = -3888.7212  
+Iteration 3:   log likelihood = -3888.6179  
+Iteration 4:   log likelihood = -3888.6178  
+
+                                                Number of obs     =        753
+                                                Wald chi2(16)     =     122.59
+Log likelihood = -3888.6178                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+       hours |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+beta         |
+    nwifeinc |  -22.73916   5.029714    -4.52   0.000    -32.59722   -12.88111
+     kidslt6 |  -979.9985    126.779    -7.73   0.000    -1228.481   -731.5161
+     kidsge6 |  -147.4886   45.51548    -3.24   0.001    -236.6973    -58.2799
+         age |   650.9173   772.1753     0.84   0.399    -862.5185    2164.353
+        educ |  -881.6671   1917.466    -0.46   0.646    -4639.832    2876.498
+        age2 |  -16.15002   14.87968    -1.09   0.278    -45.31367    13.01362
+        age3 |   .1126287   .1052143     1.07   0.284    -.0935876    .3188449
+         ed2 |    59.2153    106.909     0.55   0.580    -150.3225    268.7531
+         ed3 |  -1.468839   2.403252    -0.61   0.541    -6.179127    3.241449
+      inter1 |   7.605503   43.68489     0.17   0.862     -78.0153    93.22631
+      inter2 |  -.0265269   .3707273    -0.07   0.943     -.753139    .7000852
+      inter3 |  -.0261477   .8689382    -0.03   0.976    -1.729235     1.67694
+        unem |  -23.34518   16.64974    -1.40   0.161    -55.97806      9.2877
+        city |   51.64072   111.0829     0.46   0.642    -166.0778    269.3593
+    motheduc |   8.397817   18.93003     0.44   0.657    -28.70437        45.5
+    fatheduc |  -17.30998   18.01222    -0.96   0.337    -52.61328    17.99333
+       _cons |  -4185.306   15920.83    -0.26   0.793    -35389.55    27018.94
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |   1250.811   46.93205    26.65   0.000     1158.826    1342.796
+------------------------------------------------------------------------------
+
+. 
+. *Check if it matches OLS REG
+. tobit hours $back $horder, ll(0)
+
+Refining starting values:
+
+Grid node 0:   log likelihood = -4021.3737
+
+Fitting full model:
+
+Iteration 0:   log likelihood = -4021.3737  
+Iteration 1:   log likelihood = -3905.9974  
+Iteration 2:   log likelihood = -3888.7212  
+Iteration 3:   log likelihood = -3888.6179  
+Iteration 4:   log likelihood = -3888.6178  
+
+Tobit regression                                Number of obs     =        753
+                                                   Uncensored     =        428
+Limits: lower = 0                                  Left-censored  =        325
+        upper = +inf                               Right-censored =          0
+
+                                                LR chi2(16)       =     132.55
+                                                Prob > chi2       =     0.0000
+Log likelihood = -3888.6178                     Pseudo R2         =     0.0168
+
+------------------------------------------------------------------------------
+       hours |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    nwifeinc |  -22.73916    5.02971    -4.52   0.000    -32.61342   -12.86489
+     kidslt6 |  -979.9982    126.779    -7.73   0.000    -1228.889   -731.1073
+     kidsge6 |  -147.4885   45.51545    -3.24   0.001    -236.8439   -58.13313
+         age |   650.9169   772.1748     0.84   0.400    -865.0075    2166.841
+        educ |  -881.6666   1917.465    -0.46   0.646    -4646.011    2882.678
+        age2 |  -16.15001   14.87967    -1.09   0.278    -45.36161    13.06159
+        age3 |   .1126286   .1052142     1.07   0.285    -.0939267    .3191839
+         ed2 |   59.21527   106.9089     0.55   0.580    -150.6671    269.0976
+         ed3 |  -1.468838   2.403251    -0.61   0.541     -6.18687    3.249195
+      inter1 |     7.6055   43.68486     0.17   0.862    -78.15609    93.36709
+      inter2 |  -.0265268    .370727    -0.07   0.943    -.7543336      .70128
+      inter3 |  -.0261481   .8689377    -0.03   0.976    -1.732036     1.67974
+        unem |  -23.34517   16.64972    -1.40   0.161    -56.03171    9.341371
+        city |   51.64075   111.0829     0.46   0.642    -166.4358    269.7173
+    motheduc |   8.397813   18.93002     0.44   0.657    -28.76538      45.561
+    fatheduc |  -17.30997   18.01221    -0.96   0.337    -52.67132    18.05138
+       _cons |  -4185.303   15920.82    -0.26   0.793    -35440.86    27070.25
+-------------+----------------------------------------------------------------
+ var(e.hours)|    1564526   117405.9                       1350211     1812860
+------------------------------------------------------------------------------
+
+. 
+. 
+. *--------
+. *   E   *
+. *--------
+. program drop _all
+
+. capture program drop myheckman
+
+. 
+. program myheckman
+  1.         version 14
+  2.         args lnf theta1 theta2 lnsigma atanhp
+  3.         tempvar sigma
+  4.         tempvar rho
+  5.         gen double `sigma' = exp(`lnsigma')
+  6.         gen double `rho'= tanh(`atanhp')
+  7.         qui replace `lnf' = ln(normalden($ML_y1, `theta1',`sigma')) + ln(normal((`theta2'+ (
+> `rho'/`sigma')*($ML_y1 -`theta1'))/sqrt(1-`rho'^2))) if $ML_y2==1
+  8.         qui replace `lnf' = ln(1-normal(`theta2')) if $ML_y2==0
+  9. end
+
+. 
+. 
+. *g s=(lwage>0)
+. replace lwage = 999 if lwage == .
+(325 real changes made)
+
+. ml model lf myheckman (beta: lwage = $horder) (s: w = $back $horder) (lnsigma:) (atanhp:)
+
+. ml search
+initial:       log likelihood = -1330.0429
+alternative:   log likelihood = -1177.8198
+rescale:       log likelihood = -1152.5633
+rescale eq:    log likelihood = -985.99204
+
+. ml maximize
+
+initial:       log likelihood = -985.99204
+rescale:       log likelihood = -985.99204
+rescale eq:    log likelihood = -985.99204
+Iteration 0:   log likelihood = -985.99204  (not concave)
+Iteration 1:   log likelihood = -931.27547  (not concave)
+Iteration 2:   log likelihood = -907.57749  (not concave)
+Iteration 3:   log likelihood = -897.99386  
+Iteration 4:   log likelihood = -892.50443  
+Iteration 5:   log likelihood = -878.19682  
+Iteration 6:   log likelihood = -877.80151  
+Iteration 7:   log likelihood = -877.79688  
+Iteration 8:   log likelihood = -877.79688  
+
+                                                Number of obs     =        753
+                                                Wald chi2(11)     =      52.48
+Log likelihood = -877.79688                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+beta         |
+        age2 |  -.0013041   .0023447    -0.56   0.578    -.0058997    .0032914
+        age3 |  -4.71e-06   .0000352    -0.13   0.893    -.0000736    .0000642
+         ed2 |  -.0313712    .029264    -1.07   0.284    -.0887276    .0259851
+         ed3 |   .0026168   .0010647     2.46   0.014     .0005299    .0047036
+      inter1 |   .0159046   .0156207     1.02   0.309    -.0147115    .0465207
+      inter2 |   .0001462   .0001937     0.75   0.450    -.0002334    .0005258
+      inter3 |  -.0012845   .0003784    -3.39   0.001    -.0020263   -.0005428
+        unem |   .0030281   .0115846     0.26   0.794    -.0196773    .0257335
+        city |   .1106182   .0749757     1.48   0.140    -.0363314    .2575678
+    motheduc |  -.0110017   .0130109    -0.85   0.398    -.0365025    .0144991
+    fatheduc |  -.0136238   .0124199    -1.10   0.273    -.0379664    .0107189
+       _cons |   .8436898   .6998049     1.21   0.228    -.5279026    2.215282
+-------------+----------------------------------------------------------------
+s            |
+    nwifeinc |  -.0173274   .0045883    -3.78   0.000    -.0263202   -.0083346
+     kidslt6 |  -.7494804   .1257255    -5.96   0.000    -.9958978   -.5030629
+     kidsge6 |  -.0598926   .0400635    -1.49   0.135    -.1384156    .0186305
+         age |   .6492303   .6990086     0.93   0.353    -.7208015    2.019262
+        educ |   .2182786   1.704854     0.13   0.898    -3.123173    3.559731
+        age2 |  -.0151905   .0133599    -1.14   0.256    -.0413754    .0109944
+        age3 |   .0001193   .0000942     1.27   0.205    -.0000653    .0003038
+         ed2 |  -.0179301   .0950241    -0.19   0.850    -.2041739    .1683136
+         ed3 |   .0001218   .0021778     0.06   0.955    -.0041466    .0043902
+      inter1 |    .000548   .0410868     0.01   0.989    -.0799807    .0810767
+      inter2 |  -.0001331   .0003576    -0.37   0.710    -.0008341    .0005678
+      inter3 |   .0005223   .0007904     0.66   0.509    -.0010269    .0020715
+        unem |    -.00957   .0158171    -0.61   0.545    -.0405709    .0214309
+        city |   .0411958   .1066942     0.39   0.699     -.167921    .2503125
+    motheduc |   .0042797   .0182445     0.23   0.815    -.0314788    .0400382
+    fatheduc |  -.0150309   .0172747    -0.87   0.384    -.0488887    .0188269
+       _cons |  -9.190785   14.27711    -0.64   0.520    -37.17341    18.79184
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |  -.2949261   .0642094    -4.59   0.000    -.4207742    -.169078
+-------------+----------------------------------------------------------------
+atanhp       |
+       _cons |  -.8111952   .2187657    -3.71   0.000    -1.239968   -.3824224
+------------------------------------------------------------------------------
+
+. 
+. *See if it coincides:
+. heckman lwage $horder, select(w = $back $horder)
+
+Iteration 0:   log likelihood = -878.81877  
+Iteration 1:   log likelihood = -878.47351  
+Iteration 2:   log likelihood = -877.91766  
+Iteration 3:   log likelihood =  -877.7977  
+Iteration 4:   log likelihood = -877.79688  
+Iteration 5:   log likelihood = -877.79688  
+
+Heckman selection model                         Number of obs     =        753
+(regression model with sample selection)              Selected    =        428
+                                                      Nonselected =        325
+
+                                                Wald chi2(11)     =      52.48
+Log likelihood = -877.7969                      Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+lwage        |
+        age2 |  -.0013041   .0023447    -0.56   0.578    -.0058997    .0032914
+        age3 |  -4.71e-06   .0000352    -0.13   0.893    -.0000736    .0000642
+         ed2 |  -.0313712    .029264    -1.07   0.284    -.0887276    .0259851
+         ed3 |   .0026168   .0010647     2.46   0.014     .0005299    .0047036
+      inter1 |   .0159046   .0156207     1.02   0.309    -.0147115    .0465207
+      inter2 |   .0001462   .0001937     0.75   0.450    -.0002334    .0005258
+      inter3 |  -.0012845   .0003784    -3.39   0.001    -.0020263   -.0005428
+        unem |   .0030281   .0115846     0.26   0.794    -.0196773    .0257335
+        city |   .1106182   .0749757     1.48   0.140    -.0363314    .2575678
+    motheduc |  -.0110017   .0130109    -0.85   0.398    -.0365025    .0144991
+    fatheduc |  -.0136238   .0124199    -1.10   0.273    -.0379664    .0107189
+       _cons |   .8436894   .6998048     1.21   0.228    -.5279028    2.215282
+-------------+----------------------------------------------------------------
+w            |
+    nwifeinc |  -.0173274   .0045883    -3.78   0.000    -.0263202   -.0083346
+     kidslt6 |  -.7494805   .1257255    -5.96   0.000     -.995898   -.5030631
+     kidsge6 |  -.0598926   .0400635    -1.49   0.135    -.1384157    .0186305
+         age |   .6492305   .6990087     0.93   0.353    -.7208014    2.019262
+        educ |   .2182795   1.704854     0.13   0.898    -3.123173    3.559732
+        age2 |  -.0151905   .0133599    -1.14   0.256    -.0413754    .0109944
+        age3 |   .0001193   .0000942     1.27   0.205    -.0000653    .0003038
+         ed2 |  -.0179302   .0950241    -0.19   0.850     -.204174    .1683136
+         ed3 |   .0001218   .0021778     0.06   0.955    -.0041466    .0043902
+      inter1 |    .000548   .0410868     0.01   0.989    -.0799807    .0810767
+      inter2 |  -.0001331   .0003576    -0.37   0.710    -.0008341    .0005678
+      inter3 |   .0005223   .0007904     0.66   0.509    -.0010269    .0020715
+        unem |    -.00957   .0158171    -0.61   0.545    -.0405709    .0214309
+        city |   .0411958   .1066942     0.39   0.699     -.167921    .2503125
+    motheduc |   .0042797   .0182445     0.23   0.815    -.0314788    .0400382
+    fatheduc |  -.0150309   .0172747    -0.87   0.384    -.0488887    .0188269
+       _cons |  -9.190792   14.27711    -0.64   0.520    -37.17342    18.79183
+-------------+----------------------------------------------------------------
+     /athrho |  -.8111945   .2187658    -3.71   0.000    -1.239968   -.3824214
+    /lnsigma |  -.2949262   .0642094    -4.59   0.000    -.4207743   -.1690782
+-------------+----------------------------------------------------------------
+         rho |  -.6702487   .1204889                     -.8454464   -.3648085
+       sigma |   .7445865   .0478094                      .6565382    .8444429
+      lambda |  -.4990581   .1179995                     -.7303329   -.2677834
+------------------------------------------------------------------------------
+LR test of indep. eqns. (rho = 0):   chi2(1) =     3.16   Prob > chi2 = 0.0753
+
+. 
+. 
+. ****************
+. *   Question 2 *
+. ****************
+. ****** 2.b
+. clear all
+
+. use friedberg_cps.dta
+
+. 
+. gen agemin65=age-65
+
+. gen budget_segment=0
+
+. replace budget_segment = 1 if belowkink==1
+(1,911 real changes made)
+
+. replace budget_segment = 2 if middlesegment==1
+(789 real changes made)
+
+. replace budget_segment = 3 if uppersegment==1
+(4,086 real changes made)
+
+. 
+. gen threshold_hours=threshold/hrlywage
+
+. 
+. * Get Tau
+. gen     etau = 0.5 if inrange(age, 62, 64)
+(4,428 missing values generated)
+
+. replace etau = 0.33 if inrange(age, 65, 69)
+(3,102 real changes made)
+
+. replace etau = 0 if age>69
+(1,326 real changes made)
+
+. 
+. 
+. *Get net wage and virtual wage
+. foreach x of numlist 1/3 {
+  2.         gen netwage`x'=hrlywage
+  3.         gen virtual_inc`x'=non_labor_inc 
+  4. }
+
+. 
+. replace netwage2=etau*netwage2 
+(7,842 real changes made)
+
+. 
+. replace virtual_inc2=non_labor_inc+etau*threshold
+(6,516 real changes made)
+
+. replace virtual_inc3=non_labor_inc-incss
+(4,313 real changes made)
+
+. 
+. 
+. *Program for kinked1
+. 
+. program nonlinbudget
+  1.         version 14
+  2.         args lnf thetax thetaw thetay lnsigma
+  3.         tempvar theta1 theta2 theta3 sigma
+  4.         quietly gen double `sigma' = exp(`lnsigma')
+  5.         quietly gen double `theta1' = `thetax' + `thetaw'*$ML_y2 + `thetay'*$ML_y5 
+  6.         quietly gen double `theta2' = `thetax' + `thetaw'*$ML_y3 + `thetay'*$ML_y6 
+  7.         quietly gen double `theta3' = `thetax' + `thetaw'*$ML_y4 + `thetay'*$ML_y7
+  8. 
+.         quietly replace `lnf'= log((1/`sigma')* ///
+>                         normalden(($ML_y1-`theta1')/`sigma')) if $ML_y9==1 //bottom
+  9.                         
+.         quietly replace `lnf'= log((1/`sigma')* ///
+>                         normalden(($ML_y1-`theta2')/`sigma')) if $ML_y9==2 // mid
+ 10.                         
+.         quietly replace `lnf'= log((1/`sigma')* ///
+>                         normalden(($ML_y1-`theta3')/`sigma')) if $ML_y9==3 // top
+ 11.                         
+.         quietly replace `lnf'= ///
+>          log(normal(($ML_y8-`theta2')/`sigma')-normal(($ML_y8-`theta1')/`sigma')) ///
+>          if (normal(($ML_y8-`theta2')/`sigma')-normal(($ML_y8-`theta1')/`sigma'))>0 ///
+>          & $ML_y9==0 // kink, non negative value
+ 12.          
+.         // How is this making MLE avoid this? OHHHHHH are you saying if you make this term be n
+> egative it is v bad?
+.          quietly replace `lnf'= -99999 ///
+>          if normal(($ML_y8-`theta2')/`sigma')-normal(($ML_y8-`theta1')/`sigma')<=0 ///
+>          & $ML_y9==0 // kink negative value, make ml avoid this case
+ 13. 
+.         // why do we need this?
+.         quietly replace `lnf' = `lnf' - log(normal(`theta1'/`sigma')) //truncation 
+ 14. end
+
+. 
+. 
+. *Just created some initial values
+. 
+. mat all= [321.3,59.3,263.62,-131.96,937.33,38.8,-.03814,7.099]
+
+. 
+. ml model lf nonlinbudget (betax: annhours netwage1 netwage2 netwage3 ///
+>                 virtual_inc1 virtual_inc2 virtual_inc3 threshold_hours budget_segment = ///
+>                 hsgrad nonwhite married agemin65) (betaw:) (betay:) (lnsigma:)
+
+. ml init all, copy
+
+. ml maximize
+
+initial:       log likelihood = -57846.504
+rescale:       log likelihood = -57846.504
+rescale eq:    log likelihood = -57846.504
+Iteration 0:   log likelihood = -57846.504  
+Iteration 1:   log likelihood = -57822.061  
+Iteration 2:   log likelihood = -57802.837  
+Iteration 3:   log likelihood = -57802.713  
+Iteration 4:   log likelihood = -57802.713  
+
+                                                Number of obs     =      7,842
+                                                Wald chi2(4)      =     435.45
+Log likelihood = -57802.713                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+betax        |
+      hsgrad |   251.5249   35.44017     7.10   0.000     182.0634    320.9864
+    nonwhite |   88.12086   58.58043     1.50   0.133    -26.69468    202.9364
+     married |   196.5525   53.92128     3.65   0.000      90.8687    302.2362
+    agemin65 |   -124.642   6.553184   -19.02   0.000     -137.486    -111.798
+       _cons |   857.3602   61.81666    13.87   0.000     736.2018    978.5186
+-------------+----------------------------------------------------------------
+betaw        |
+       _cons |   45.29674    1.46846    30.85   0.000     42.41861    48.17487
+-------------+----------------------------------------------------------------
+betay        |
+       _cons |   -.027275   .0013459   -20.27   0.000    -.0299129   -.0246371
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |   7.063945   .0175534   402.43   0.000     7.029541    7.098349
+------------------------------------------------------------------------------
+
+. 
+. 
+. mat b =e(b)
+
+. scalar wagecoef= b[1,6]
+
+. gen wage=hrlywage
+
+. replace wage=hrlywage*.5 if budget_segment==2 |budget_segment==0
+(1,845 real changes made)
+
+. sum wage
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+        wage |      7,842    10.52819    9.429978   .5173349   98.24865
+
+. scalar wagemean = r(mean)
+
+. sum annhours
+
+    Variable |        Obs        Mean    Std. Dev.       Min        Max
+-------------+---------------------------------------------------------
+    annhours |      7,842    1458.318    879.8882          4       5148
+
+. scalar hoursmean = r(mean)
+
+. 
+. /*
+> Uncompensated wage elasticity is the derivative of hours w.r.t. to net wage
+> times the average net wage over the average hours
+> */
+. di "Uncompensated wage elasticity:" wagecoef*wagemean/hoursmean
+Uncompensated wage elasticity:.3270158
+
+. 
+. ****** 2.c 
+. foreach x of numlist 1/3 {
+  2.         gen lnetwage`x'=log(netwage`x') 
+  3. }
+(1,326 missing values generated)
+
+. mat all= [321.3,59.3,263.62,-131.96,937.33,log(38.8),-.03814,7.099]
+
+. 
+. ml model lf nonlinbudget (betax: annhours lnetwage1 lnetwage2 lnetwage3 ///
+>                 virtual_inc1 virtual_inc2 virtual_inc3 threshold_hours budget_segment = ///
+>                 hsgrad nonwhite married agemin65) (betaw:) (betay:) (lnsigma:)
+
+. ml init all, copy
+
+. ml maximize
+
+initial:       log likelihood = -49510.862
+rescale:       log likelihood = -49510.862
+rescale eq:    log likelihood = -48382.256
+Iteration 0:   log likelihood = -48382.256  
+Iteration 1:   log likelihood = -48112.157  
+Iteration 2:   log likelihood =  -47989.86  
+Iteration 3:   log likelihood = -47982.788  
+Iteration 4:   log likelihood = -47982.771  
+Iteration 5:   log likelihood = -47982.771  
+
+                                                Number of obs     =      6,516
+                                                Wald chi2(4)      =     250.41
+Log likelihood = -47982.771                     Prob > chi2       =     0.0000
+
+------------------------------------------------------------------------------
+             |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+betax        |
+      hsgrad |   151.4503   30.95689     4.89   0.000      90.7759    212.1247
+    nonwhite |   85.25673   51.63648     1.65   0.099    -15.94892    186.4624
+     married |     151.52   47.56154     3.19   0.001     58.30108    244.7389
+    agemin65 |   -108.637   7.499426   -14.49   0.000    -123.3356   -93.93841
+       _cons |   352.4167   60.02409     5.87   0.000     234.7717    470.0618
+-------------+----------------------------------------------------------------
+betaw        |
+       _cons |   502.3928   15.48123    32.45   0.000     472.0501    532.7354
+-------------+----------------------------------------------------------------
+betay        |
+       _cons |  -.0154986   .0010565   -14.67   0.000    -.0175694   -.0134279
+-------------+----------------------------------------------------------------
+lnsigma      |
+       _cons |   6.925517   .0142765   485.10   0.000     6.897535    6.953498
+------------------------------------------------------------------------------
+
+. mat b =e(b)
+
+. scalar lwagecoef= b[1,6]
+
+. 
+. 
+. /*
+> ************Trying to figure out which is which - HERE THERE IS A PROBLEM ---> THINGS SHOULD CO
+> INCIDE
+> g probar = belowkink + middlesegment + uppersegment + atkink
+> tab probar,m
+> 
+> g MS=(threshold<earnings<threshold+incss/tau)
+> g BK=(earnings<threshold)
+> g atBK=belowkink+ atkink
+> tab BK belowkink 
+> tab BK atBK
+> tab MS middlesegment
+> 
+> */
+. *****************
+. * Question 3
+. *****************
+. *The dofile contains the solution for both cases delta=1000 and delta=1500
+. 
+. clear all
+
+. use cps_ssa_1978.dta
+(1978 CPS SSA Exact Match File)
+
+. g earn_minus_threshold=earn-threshold
+
+. 
+. *Histogram
+. histogram earn_minus_threshold if inrange(earn_minus_threshold, -2000, 2000), width(50) xline(0
+> )
+(bin=80, start=-1994.5613, width=50)
+
+. 
+. 
+. *Create Groups
+. *H*
+. local delta = 1500
+
+. *local delta= 1000
+. g Hstar= (earn_minus_threshold-`delta'<earn<=earn_minus_threshold+`delta')
+
+. 
+. *Hstarminus
+. g Hstarminus=(earn_minus_threshold -2*`delta'<earn<earn_minus_threshold -`delta')
+
+. 
+. *Hstarplus
+. g Hstarplus=(earn_minus_threshold +`delta'<earn<earn_minus_threshold +2*`delta')
+
+. 
+. *Create means
+. foreach var of varlist Hstar Hstarminus Hstarplus{
+  2.         qui sum `var'
+  3.         local `var'=r(mean)*100         
+  4. }
+
+. 
+. local B = Hstar-(Hstarminus+Hstarplus)
+
+. di `B'
+-1
+
+. 
+. local Hstarminus = Hstarminus/`delta'
+
+. local Hstarplus=Hstarplus/`delta'
+
+. 
+. di `Hstarminus'
+.00066667
+
+. di `Hstarplus'
+.00066667
+
+. 
+. *Calculate e
+. *Create H 
+. local ache=(Hstarminus + Hstarplus)/2
+
+. local e=((`B'/`ache')/(earn_minus_threshold)*(ln((1-0)/(1-0.5))))
+
+. di `e'
+-.00002739
+
+. 
+. log close
+      name:  <unnamed>
+       log:  /Users/leticiajuarez/Desktop/621 - Field Class Labor/Homeworks/HW3/HW3.log
+  log type:  text
+ closed on:   2 Oct 2018, 19:56:32
+-------------------------------------------------------------------------------------------------
